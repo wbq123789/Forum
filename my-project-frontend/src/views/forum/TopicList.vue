@@ -18,6 +18,7 @@ const weather=reactive({
   hourly:[],
   success:false
 });
+const editor=ref(false)
 get('api/forum/getIP',(data)=>{
   IP.value=data
 })
@@ -46,7 +47,7 @@ navigator.geolocation.getCurrentPosition(position => {
 <div style="display: flex;margin: 20px auto;gap: 20px;max-width: 900px">
   <div style="flex: 1">
     <LightCard>
-      <div class="create-topic">
+      <div class="create-topic" @click="editor=true">
         <el-icon class="icon"><EditPen/></el-icon>
         点击发表主题...
       </div>
@@ -101,7 +102,7 @@ navigator.geolocation.getCurrentPosition(position => {
       </div>
     </div>
   </div>
-  <TopicEditor :show="true"></TopicEditor>
+  <TopicEditor :show="editor" @close="editor=false"></TopicEditor>
 </div>
 </template>
 
