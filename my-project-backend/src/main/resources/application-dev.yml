@@ -1,0 +1,66 @@
+# 开发环境配置
+springdoc:
+  paths-to-match: /api/**
+  swagger-ui:
+    operations-sorter: alpha
+spring:
+  mail:
+    host: smtp.163.com
+    username: javaweb111@163.com
+    password: UMUNGOCGACNHANOL
+    port: 25
+  rabbitmq:
+    addresses: 154.9.254.205
+    username: rabbitmq
+    password: qaz13579
+    virtual-host: /
+  datasource:
+    hikari:
+      idle-timeout: 60000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      minimum-idle: 5
+      maximum-pool-size: 20
+    url: jdbc:mysql://154.9.254.205:3306/Forum
+    username: Forum
+    password: tafGYzAMEmY4WSJC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      database: 0
+      host: 154.9.254.205
+      port: 6379
+      username: dokihub
+      password: flying13579
+      lettuce:
+        pool:
+          min-idle: 2
+          max-idle: 10
+  security:
+    jwt:
+      key: 'my-forum-key'
+      expire: 72
+      limit:
+        base: 10
+        upgrade: 300
+        frequency: 30
+    filter:
+      order: -100
+  web:
+    verify:
+      mail-limit: 60
+    flow:
+      period: 3
+      limit: 50
+      block: 30
+    cors:
+      origin: '*'
+      credentials: false
+      methods: '*'
+minio:
+  endpoint: http://154.9.254.205:9000
+  access-key: JAm1aUN2PHwmgOPAEO07
+  secret-key: 41LwF9eotVRVcgQBN9uCgfxVkvY0JX3GFS9TP5W1
+  bucket-name: forum
+weather:
+  key: e770b20ba7384ad28533bb81da1acf1c
