@@ -23,5 +23,9 @@ public final class Const {
     //用户角色
     public final static String ROLE_DEFAULT = "user";
     public final static String ROLE_ADMINISTER = "admin";
-
+    //论坛相关
+    public final static String FORUM_WEATHER_CACHE = "weather:cache:";
+    public final static String FORUM_IMAGE_COUNTER = "forum:image:";
+    public final static String FORUM_TOPIC_CREATE_COUNTER = "forum:topic:create:";
+    public final static String FORUM_TOPIC_PREVIEW_COUNTER = "topic:preview:";
 }

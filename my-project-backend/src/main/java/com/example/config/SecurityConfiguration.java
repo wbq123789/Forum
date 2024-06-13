@@ -54,7 +54,7 @@ public class SecurityConfiguration {
         return http
                 .authorizeHttpRequests(conf -> conf
                         .requestMatchers("/api/auth/**", "/error").permitAll()
-                        .requestMatchers("/api/file/download/avatar/**").permitAll()
+                        .requestMatchers("/api/file/download/images/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().hasAnyRole(Const.ROLE_DEFAULT)
                 )

@@ -1,7 +1,7 @@
 <script setup>
 
 import Card from "@/components/Card.vue";
-import {Message, Refresh, Select, Upload, User} from "@element-plus/icons-vue";
+import {Message, Refresh, Select, User} from "@element-plus/icons-vue";
 import {useStore} from "@/store";
 import {computed, reactive, ref} from "vue";
 import {accessHeader, get, post} from "@/net";
