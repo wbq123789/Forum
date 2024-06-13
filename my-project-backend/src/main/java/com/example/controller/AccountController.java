@@ -14,6 +14,7 @@ import com.example.service.AccountDetailsService;
 import com.example.service.AccountPrivacyService;
 import com.example.service.AccountService;
 import com.example.utils.Const;
+import com.example.utils.ControllerUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -39,6 +40,8 @@ public class AccountController {
     AccountDetailsService detailsService;
     @Resource
     AccountPrivacyService privacyService;
+    @Resource
+    ControllerUtils utils;
 
     /**
      * 获取用户信息
@@ -85,7 +88,7 @@ public class AccountController {
     @PostMapping("/modify-email")
     @Operation(summary = "修改邮箱地址")
     public RestBean<Void> modifyEmail(@RequestAttribute(Const.ATTR_USER_ID) Integer userId, @RequestBody @Valid ModifyEmailVO modifyEmailVO) {
-        return this.messageHandle(() ->
+        return utils.messageHandle(() ->
                 accountService.modifyEmail(userId, modifyEmailVO));
     }
     /**
@@ -97,7 +100,7 @@ public class AccountController {
     @PostMapping("/change-password")
     @Operation(summary = "修改密码")
     public RestBean<Void> changePassword(@RequestAttribute(Const.ATTR_USER_ID) Integer userId, @RequestBody @Valid ChangePasswordVO changePasswordVO) {
-        return this.messageHandle(() ->
+        return utils.messageHandle(() ->
                 accountService.changePassword(userId, changePasswordVO));
     }
     /**
@@ -121,18 +124,5 @@ public class AccountController {
     @Operation(summary = "获取用户隐私信息公开选项")
     public RestBean<AccountPrivacyVO> getPrivacy(@RequestAttribute(Const.ATTR_USER_ID) Integer userId) {
         return RestBean.success(privacyService.getAccountPrivacy(userId).asViewObject(AccountPrivacyVO.class));
-    }
-    /**
-     * 针对于返回值为String作为错误信息的方法进行统一处理
-     * @param action 具体操作
-     * @return 响应结果
-     * @param <T> 响应结果类型
-     */
-    private <T> RestBean<T> messageHandle(Supplier<String> action){
-        String message = action.get();
-        if(message == null)
-            return RestBean.success();
-        else
-            return RestBean.failure(400, message);
     }
 }
