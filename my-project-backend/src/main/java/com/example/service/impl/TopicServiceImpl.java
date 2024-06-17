@@ -5,14 +5,12 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.entity.dto.Topic;
-import com.example.entity.dto.TopicType;
+import com.example.entity.dto.*;
 import com.example.entity.vo.response.TopicCreateVO;
+import com.example.entity.vo.response.TopicDetailVO;
 import com.example.entity.vo.response.TopicPreviewVO;
 import com.example.entity.vo.response.TopicTopVO;
-import com.example.mapper.AccountMapper;
-import com.example.mapper.TopicMapper;
-import com.example.mapper.TopicTypeMapper;
+import com.example.mapper.*;
 import com.example.service.TopicService;
 import com.example.utils.CacheUtils;
 import com.example.utils.Const;
@@ -37,6 +35,10 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
     TopicTypeMapper topicTypeMapper;
     @Resource
     AccountMapper accountMapper;
+    @Resource
+    AccountDetailsMapper accountDetailsMapper;
+    @Resource
+    AccountPrivacyMapper accountPrivacyMapper;
 
     @Resource
     FlowUtils flowUtils;
@@ -74,7 +76,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         topic.setTime(new Date());
         topic.setContent(vo.getContent().toJSONString());
         if (this.save(topic)) {
-            cacheUtils.deleteCachePattern(Const.FORUM_TOPIC_PREVIEW_COUNTER+"*");
+            cacheUtils.deleteCachePattern(Const.FORUM_TOPIC_PREVIEW_CACHE+"*");
             return null;
         }
         return "内部错误，请联系管理员！";
@@ -91,28 +93,48 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
             return vo;
         }).toList();
     }
+    private <T> T fillUserDetailsByPrivacy(T target,int uid){
+        AccountDetails details=accountDetailsMapper.selectById(uid);
+        Account account=accountMapper.selectById(uid);
+        AccountPrivacy privacy=Optional.ofNullable(accountPrivacyMapper.selectById(uid)).orElse(new AccountPrivacy(uid));
+        String[] ignores = privacy.hiddenFields();
+        BeanUtils.copyProperties(account,target,ignores);
+        BeanUtils.copyProperties(details,target,ignores);
+        return target;
+    }
 
     @Override
     public List<TopicPreviewVO> listTopicByPage(int pageNumber, int type) {
-        String key=Const.FORUM_TOPIC_PREVIEW_COUNTER +pageNumber+":"+type;
-        List<TopicPreviewVO> list=cacheUtils.takeLisFormCache(key,TopicPreviewVO.class);
-        if(list!=null)
+        String key = Const.FORUM_TOPIC_PREVIEW_CACHE + pageNumber + ":" + type;
+        List<TopicPreviewVO> list = cacheUtils.takeListFormCache(key, TopicPreviewVO.class);
+        if(list != null)
             return list;
-        Page<Topic> page=new Page<>(pageNumber+1,10);
-        if (type==0)
+        Page<Topic> page = Page.of(pageNumber, 10);
+        if(type == 0)
             baseMapper.selectPage(page,Wrappers.<Topic>query().orderByDesc("time"));
         else
-            baseMapper.selectPage(page,Wrappers.<Topic>query().eq("type",type).orderByDesc("time"));
-        List<Topic> topics=page.getRecords();
-        if (topics==null) return null;
-        list=topics.stream().map(this::resolvePreview).toList();
-        cacheUtils.saveListObject(key,list,60);
+            baseMapper.selectPage(page,Wrappers.<Topic>query().eq("type", type).orderByDesc("time"));
+        List<Topic> topics = page.getRecords();
+        if(topics.isEmpty()) return null;
+        list = topics.stream().map(this::resolvePreview).toList();
+        cacheUtils.saveListToCache(key, list, 60);
         return list;
     }
+
+    @Override
+    public TopicDetailVO getTopic(int tid) {
+        TopicDetailVO vo=new TopicDetailVO();
+        Topic topic=baseMapper.selectById(tid);
+        BeanUtils.copyProperties(topic,vo);
+        TopicDetailVO.User user=new TopicDetailVO.User();
+        vo.setUser(fillUserDetailsByPrivacy(user,topic.getUid()));
+        return vo;
+    }
+
     private TopicPreviewVO resolvePreview(Topic topic){
         TopicPreviewVO vo=new TopicPreviewVO();
         BeanUtils.copyProperties(topic,vo);
-        BeanUtils.copyProperties(accountMapper.selectById(topic.getUid()),vo);
+        BeanUtils.copyProperties(accountMapper.selectById(topic.getUid()),vo,"uid","id");
         List<String> images=new ArrayList<>();
         StringBuilder previewText=new StringBuilder();
         JSONArray ops=JSONObject.parseObject(topic.getContent()).getJSONArray("ops");
@@ -121,7 +143,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
             if(insert instanceof String text) {
                 if(previewText.length()>=300) continue;
                 previewText.append(text);
-            } else if (insert instanceof Map<?, ?> map) {
+            }else if(insert instanceof Map<?, ?> map) {
                 Optional.ofNullable(map.get("image"))
                         .ifPresent(obj->images.add(obj.toString()));
             }

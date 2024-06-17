@@ -34,7 +34,7 @@ public class TopicDetailVO {
         Integer id;
         String username;
         String avatar;
-        String desc;
+        String intro;
         Integer gender;
         String qq;
         String wx;

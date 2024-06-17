@@ -26,18 +26,18 @@ public class CacheUtils {
         return JSONArray.parseArray(s).to(dataType);
     }
 
-    public <T> List<T> takeLisFormCache(String key,Class<T> itemType){
+    public <T> List<T> takeListFormCache(String key,Class<T> itemType){
         String s=stringRedisTemplate.opsForValue().get(key);
         if(s==null) return null;
         return JSONArray.parseArray(s).toList(itemType);
     }
 
-    public <T> void saveObject(String key, T list,long expire){
-        stringRedisTemplate.opsForValue().set(key, JSONObject.from(list).toJSONString(),expire, TimeUnit.SECONDS);
+    public <T> void saveToCache(String key, T data, long expire) {
+        stringRedisTemplate.opsForValue().set(key, JSONObject.from(data).toJSONString(), expire, TimeUnit.SECONDS);
     }
 
-    public <T> void saveListObject(String key, List<T> list,long expire){
-        stringRedisTemplate.opsForValue().set(key,JSONArray.from(list).toJSONString(),expire, TimeUnit.SECONDS);
+    public <T> void saveListToCache(String key, List<T> list, long expire) {
+        stringRedisTemplate.opsForValue().set(key, JSONArray.from(list).toJSONString(), expire, TimeUnit.SECONDS);
     }
     public void deleteCachePattern(String key){
         Set<String> keys = Optional.ofNullable(stringRedisTemplate.keys(key)).orElse(Collections.emptySet());

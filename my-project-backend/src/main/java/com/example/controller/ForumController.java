@@ -53,6 +53,10 @@ public class ForumController {
     public RestBean<List<TopicTopVO>> topTopic(){
         return RestBean.success(topicService.listTopTopics());
     }
+    @GetMapping("/topic")
+    public RestBean<TopicDetailVO> getTopic(@RequestParam @Min(1) int tid){
+        return RestBean.success(topicService.getTopic(tid));
+    }
     @GetMapping("/getIP")
     public RestBean<String> getIpAddress(HttpServletRequest request) {
         String ipAddress = request.getHeader("X-Forwarded-For");
