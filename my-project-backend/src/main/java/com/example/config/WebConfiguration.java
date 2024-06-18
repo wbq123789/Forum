@@ -11,7 +11,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * 一般Web服务相关配置
+ * @Param: forum
+ * @description: Web配置类
+ * @Author: 王贝强
+ * @Create: 2024-06-10 17:37
  */
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {

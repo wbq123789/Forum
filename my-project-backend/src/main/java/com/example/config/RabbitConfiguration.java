@@ -6,7 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * RabbitMQ消息队列配置
+ * @program: forum
+ * @description: RabbitMQ配置类
+ * @author: 王贝强
+ * @create: 2024-06-10 16:23
  */
 @Configuration
 public class RabbitConfiguration {

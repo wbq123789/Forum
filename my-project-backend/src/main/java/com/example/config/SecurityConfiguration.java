@@ -26,7 +26,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * SpringSecurity相关配置
+ * @program: forum
+ * @description: SpringSecurity配置类
+ * @author: 王贝强
+ * @create: 2024-06-10 16:23
  */
 @Configuration
 public class SecurityConfiguration {

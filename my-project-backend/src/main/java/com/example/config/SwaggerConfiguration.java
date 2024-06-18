@@ -26,7 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Swagger开发文档相关配置
+ * @program: forum
+ * @description: Swagger配置类
+ * @author: 王贝强
+ * @create: 2024-06-10 18:02
  */
 @Configuration
 @SecurityScheme(type = SecuritySchemeType.HTTP, scheme = "Bearer",

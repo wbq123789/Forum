@@ -4,6 +4,8 @@ import com.example.entity.RestBean;
 import com.example.service.FileService;
 import com.example.utils.Const;
 import io.minio.errors.ErrorResponseException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,12 +24,20 @@ import java.io.IOException;
  */
 @Slf4j
 @RestController
+@Tag(name = "文件上传下载相关", description = "包括头像、图片等文件的上传下载操作。")
 @RequestMapping("/api/file")
 public class FileController {
     @Resource
     FileService fileService;
-
+    /**
+     * 上传头像
+     * @param file 头像文件
+     * @param userId 用户ID
+     * @return 上传结果
+     * @throws IOException IO异常
+     */
     @PostMapping("/upload/avatar")
+    @Operation(summary = "上传头像")
     public RestBean<String> uploadAvatar(@RequestParam("file") MultipartFile file,
                                          @RequestAttribute(Const.ATTR_USER_ID) Integer userId) throws IOException {
         if (file.isEmpty()) {
@@ -44,7 +54,15 @@ public class FileController {
              return RestBean.failure(400, "头像上传失败，请联系管理员！");
         }
     }
+    /**
+     * 上传图片
+     * @param file 图片文件
+     * @param userId 用户ID
+     * @return 上传结果
+     * @throws IOException IO异常
+     */
     @PostMapping("/upload/image")
+    @Operation(summary = "上传图片")
     public RestBean<String> uploadImage(@RequestParam("file") MultipartFile file,
                                         @RequestAttribute(Const.ATTR_USER_ID) Integer userId,
                                         HttpServletResponse response) throws IOException {
@@ -63,12 +81,24 @@ public class FileController {
             return RestBean.failure(400, "图片上传失败，请联系管理员！");
         }
     }
-
+    /**
+     * 下载头像
+     * @param request 请求
+     * @param response 响应
+     * @throws Exception 异常
+     */
     @GetMapping("/download/images/**")
+    @Operation(summary = "下载图片")
     public void avatarFetch(HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setHeader("Content-Type","image/jpeg");
         this.fetchImage(request,response);
     }
+    /**
+     * 下载图片
+     * @param request 请求
+     * @param response 响应
+     * @throws Exception 异常
+     */
     private void fetchImage(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String imagePath= request.getServletPath().substring(25);
         ServletOutputStream outputStream = response.getOutputStream();
