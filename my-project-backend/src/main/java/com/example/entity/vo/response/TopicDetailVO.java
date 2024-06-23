@@ -19,15 +19,15 @@ public class TopicDetailVO {
     Integer type;
     Date time;
     User user;
-//    Interact interact;
+    Interact interact;
 //     Long comments;
 
-//    @Data
-//    @AllArgsConstructor
-//    public static class Interact {
-//        Boolean like;
-//        Boolean collect;
-//    }
+    @Data
+    @AllArgsConstructor
+    public static class Interact {
+        Boolean like;
+        Boolean collect;
+    }
 
     @Data
     public static class User {
