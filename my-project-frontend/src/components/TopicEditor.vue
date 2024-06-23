@@ -5,15 +5,44 @@ import {computed, reactive, ref} from "vue";
 import "@vueup/vue-quill/dist/vue-quill.snow.css"
 import ImageResize from "quill-image-resize-vue";
 import { ImageExtend, QuillWatch } from "quill-image-super-solution-module";
-import {Quill, QuillEditor} from "@vueup/vue-quill";
+import {Delta, Quill, QuillEditor} from "@vueup/vue-quill";
 import {accessHeader, get, post} from "@/net";
 import {ElMessage} from "element-plus";
 import axios from "axios";
 import ColorDot from "@/components/ColorDot.vue";
 import {useStore} from "@/store";
 
-defineProps({
-  show:Boolean
+const props = defineProps({
+  show:Boolean,
+  defaultTitle: {
+    default: '',
+    type: String
+  },
+  defaultText: {
+    default: '',
+    type: String
+  },
+  defaultType: {
+    default: null,
+    type: Number
+  },
+  submitButton: {
+    default: '立即发表主题',
+    type: String
+  },
+  submit: {
+    default: (editor, success) => {
+      post('/api/forum/create-topic', {
+        type: editor.type.id,
+        title: editor.title,
+        content: editor.text
+      }, () => {
+        ElMessage.success("帖子发表成功！")
+        success()
+      })
+    },
+    type: Function
+  }
 })
 const store=useStore()
 const emit=defineEmits(['close','success'])
@@ -26,9 +55,18 @@ const editor=reactive({
 })
 
 function initEditor() {
-  EditorRef.value.setContents('','user')
-  editor.title=''
-  editor.type=null
+  if (props.defaultText)
+    editor.text=new Delta(JSON.parse(props.defaultText))
+  else
+    EditorRef.value.setContents('','user')
+  editor.title=props.defaultTitle
+  editor.type=findTypeById(props.defaultType)
+}
+function findTypeById(id){
+  for (let type of store.forum.types) {
+    if(type.id === id)
+      return type
+  }
 }
 function submitTopic() {
   const text = deltaToText(editor.text)
@@ -44,14 +82,7 @@ function submitTopic() {
     ElMessage.warning('请选择一个合适的帖子类型！')
     return
   }
-  post('/api/forum/create-topic', {
-    type: editor.type.id,
-    title: editor.title,
-    content: editor.text
-  }, () => {
-    ElMessage.success("帖子发表成功！")
-    emit('success')
-  })
+  props.submit(editor,()=>emit('success'))
 }
 function deltaToText(delta) {
   if(!delta.ops) return ""
@@ -166,7 +197,7 @@ const editorOption = {
         当前字数 {{contentLength}} （最大支持20000字）
       </div>
       <div>
-        <el-button type="success" :icon="Check" @click="submitTopic" plain>立即发布</el-button>
+        <el-button type="success" :icon="Check" @click="submitTopic" plain>{{submitButton}}</el-button>
       </div>
     </div>
   </el-drawer>

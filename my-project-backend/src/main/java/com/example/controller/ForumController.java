@@ -7,7 +7,6 @@ import com.example.service.TopicService;
 import com.example.service.WeatherService;
 import com.example.utils.Const;
 import com.example.utils.ControllerUtils;
-import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -15,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -102,13 +102,43 @@ public class ForumController {
                                             @RequestAttribute(Const.ATTR_USER_ID) int uid){
         return RestBean.success(topicService.getTopic(tid,uid));
     }
+    /**
+     * 更新话题
+     * @param vo 话题信息
+     * @return 更新结果
+     */
+    @PostMapping("/update-topic")
+    public RestBean<Void> updateTopic(@Valid @RequestBody TopicUpdateVO vo,
+                                      @RequestAttribute(Const.ATTR_USER_ID) int uid){
+        return utils.messageHandle(() -> topicService.updateTopic(uid,vo));
+
+    }
+    /**
+     * 点赞/收藏
+     * @param tid 话题ID
+     * @param type 互动类型
+     * @param state 互动状态
+     * @param uid 用户ID
+     * @return 正常为空
+     */
     @GetMapping("/interact")
+    @Operation(summary = "点赞/收藏")
     public RestBean<Void> interact(@RequestParam @Min(1) int tid,
                                    @RequestParam @Pattern(regexp = ("like|collect")) String type,
                                    @RequestParam boolean state,
                                    @RequestAttribute(Const.ATTR_USER_ID) int uid){
         topicService.interact(new Interact(tid,uid,new Date(),type),state);
         return RestBean.success();
+    }
+    /**
+     * 获取用户收藏的帖子
+     * @param uid 用户ID
+     * @return 帖子列表
+     */
+    @GetMapping("/collects")
+    @Operation(summary = "获取用户收藏的帖子")
+    public RestBean<List<TopicPreviewVO>> collects(@RequestAttribute(Const.ATTR_USER_ID) int uid){
+        return RestBean.success(topicService.listTopicCollects(uid));
     }
     /**
      * 获取用户IP地址

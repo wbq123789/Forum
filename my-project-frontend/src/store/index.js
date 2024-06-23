@@ -4,6 +4,7 @@ export const useStore = defineStore('general', {
     state:()=>{
         return {
             user:{
+                id: -1,
                 username: '',
                 email: '',
                 role: '',

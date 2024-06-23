@@ -45,4 +45,9 @@ public interface TopicMapper extends BaseMapper<Topic> {
             select count(*) from topic_interact_${type} where tid = #{tid} and uid = #{uid}
             """)
     int userInteractCount(int tid, int uid, String type);
+    @Select("""
+            select * from topic_interact_collect left join topic on tid = topic.id
+             where topic_interact_collect.uid = #{uid}
+            """)
+    List<Topic> collectTopics(int uid);
 }
