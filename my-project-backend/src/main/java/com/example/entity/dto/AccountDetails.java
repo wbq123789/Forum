@@ -6,6 +6,7 @@ import com.example.entity.BaseData;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * @program: forum
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @TableName("account_details")
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountDetails implements BaseData {

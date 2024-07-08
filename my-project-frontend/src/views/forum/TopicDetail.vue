@@ -108,9 +108,7 @@ function deleteComment(cid) {
     </div>
     <div class="topic-main">
       <div class="topic-main-left">
-        <el-avatar :src="topic.data.user.avatar===null ?
-        'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png':
-        `${axios.defaults.baseURL}/api/file/download/images${topic.data.user.avatar}`"
+        <el-avatar :src="store.avatarUserUrl(topic.data.user.avatar)"
         :size="60"/>
         <div>
           <div style="font-size: 18px;font-weight: bold">
@@ -167,9 +165,7 @@ function deleteComment(cid) {
       <div v-if="topic.comments">
         <div class="topic-main" style="margin-top: 10px" v-for="item in topic.comments">
           <div class="topic-main-left">
-            <el-avatar :src="item.user.avatar===null ?
-        'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png':
-        `${axios.defaults.baseURL}/api/file/download/images${item.user.avatar}`"
+            <el-avatar :src="store.avatarUserUrl(item.user.avatar)"
                        :size="60"/>
             <div>
               <div style="font-size: 18px;font-weight: bold">
@@ -195,7 +191,7 @@ function deleteComment(cid) {
               </div>
               <div>
                 <el-link :icon="ChatSquare" type="info" @click="comment.show=true;comment.quote=item">回复评论</el-link>
-                <el-link :icon="Delete" type="danger" @click="deleteComment(item.id)" v-if="item.user.id=store.user.id" style="margin-left: 20px">&nbsp;删除评论</el-link>
+                <el-link :icon="Delete" type="danger" @click="deleteComment(item.id)" v-if="item.user.id===store.user.id" style="margin-left: 20px">&nbsp;删除评论</el-link>
               </div>
             </div>
 

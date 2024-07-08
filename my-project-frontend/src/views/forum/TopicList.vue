@@ -134,9 +134,7 @@ navigator.geolocation.getCurrentPosition(position => {
             <div style="display: flex">
               <div>
                 <el-avatar :size="30"
-                           :src="item.avatar===null ?
-                       `https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png`
-                       : `${axios.defaults.baseURL}/api/file/download/images${item.avatar}`"/>
+                           :src="store.avatarUserUrl(item.avatar)"/>
               </div>
               <div style="margin-left: 7px;transform: translateY(-2px)">
                 <div style="font-size: 13px;font-weight: bold">{{item.username}}</div>

@@ -3,8 +3,12 @@ package com.example.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Account;
+import com.example.entity.dto.AccountDetails;
+import com.example.entity.dto.AccountPrivacy;
 import com.example.entity.vo.request.*;
+import com.example.mapper.AccountDetailsMapper;
 import com.example.mapper.AccountMapper;
+import com.example.mapper.AccountPrivacyMapper;
 import com.example.service.AccountService;
 import com.example.utils.Const;
 import com.example.utils.FlowUtils;
@@ -42,6 +46,12 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     @Resource
     PasswordEncoder passwordEncoder;
+
+    @Resource
+    AccountPrivacyMapper privacyMapper;
+
+    @Resource
+    AccountDetailsMapper detailsMapper;
 
     @Resource
     FlowUtils flow;
@@ -105,6 +115,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
             return "内部错误，注册失败";
         } else {
             this.deleteEmailVerifyCode(email);
+            privacyMapper.insert(new AccountPrivacy(account.getId()));
+            AccountDetails details=new AccountDetails();
+            details.setId(account.getId());
+            detailsMapper.insert(details);
             return null;
         }
     }
