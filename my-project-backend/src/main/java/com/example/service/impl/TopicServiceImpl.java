@@ -201,18 +201,28 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
             CommentVO vo=new CommentVO();
             BeanUtils.copyProperties(dto,vo);
             if(dto.getQuote()>0){
-                JSONObject object=JSONObject.parseObject(
-                        topicCommentMapper.selectOne(Wrappers.<TopicComment>query().eq("id",dto.getId()).orderByAsc("time")).getContent()
-                );
-                StringBuilder builder=new StringBuilder();
-                shoutContent(object.getJSONArray("ops"),builder,ignore->{});
-                vo.setQuote(builder.toString());
+                TopicComment comment = topicCommentMapper.selectOne(Wrappers.<TopicComment>query().eq("id", dto.getQuote()).orderByAsc("time"));
+                if (comment!=null){
+                    JSONObject object=JSONObject.parseObject(comment.getContent());
+                    StringBuilder builder=new StringBuilder();
+                    shoutContent(object.getJSONArray("ops"),builder,ignore->{});
+                    vo.setQuote(builder.toString());
+                }else {
+                    vo.setQuote("此评论已被删除");
+                }
+
             }
             CommentVO.User user=new CommentVO.User();
             this.fillUserDetailsByPrivacy(user,dto.getUid());
             vo.setUser(user);
             return vo;
         }).toList();
+    }
+
+    @Override
+    public String deleteComment(int cid, int uid) {
+        int delete = topicCommentMapper.delete(Wrappers.<TopicComment>query().eq("id", cid).eq("uid", uid));
+        return delete==1 ? null : "评论删除失败！";
     }
 
     private boolean hasInteract(int tid, int uid, String type){

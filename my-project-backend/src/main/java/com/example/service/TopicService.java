@@ -28,4 +28,5 @@ public interface TopicService extends IService<Topic> {
     String updateTopic(int uid, TopicUpdateVO vo);
     String createComment(int uid, AddCommentVO vo);
     List<CommentVO> comments(int tid,int page);
+    String deleteComment(int cid,int uid);
 }

@@ -7,27 +7,44 @@ import {ElMessage} from "element-plus";
 const props=defineProps({
   show:Boolean,
   tid:String,
-  quote:Number
+  quote:Object
 })
 const emit=defineEmits(['close','comment'])
 const content=ref()
 const init = () => content.value=new Delta()
 function submitComment() {
+  if (deltaToText(content.value).length) {
+    ElMessage.warning("评论字数超过最大限制，请修改评论内容！")
+    return
+  }
   post('/api/forum/add-comment',{
     tid: props.tid,
-    quote: props.quote,
+    quote: props.quote ? props.quote.id : -1,
     content: JSON.stringify(content.value)
   },()=>{
     ElMessage.success('发表评论成功！')
     emit('comment')
   })
 }
+function deltaToSimpleText(delta) {
+  let str = deltaToText(JSON.parse(delta))
+  if (str.length>35) str = str.substring(0,35) +'...'
+  return str
+}
+
+function deltaToText(delta) {
+  if(!delta?.ops) return ""
+  let str = ""
+  for(let op of delta.ops)
+    str+=op.insert
+  return str.replace(/\s/g,"");
+}
 </script>
 
 <template>
   <div>
     <el-drawer :model-value="show"
-               title="发表评论"
+               :title="quote ? `发表对评论：${deltaToSimpleText(quote.content)} 的回复` : '发表评论'"
                @open="init"
                direction="btt" :size="270"
                :close-on-click-modal="false"
@@ -38,7 +55,10 @@ function submitComment() {
                         placeholder="请文明发表评论，谢谢！"
                         v-model:content="content"/>
         </div>
-        <div style="margin-top: 10px;text-align: right">
+        <div style="margin-top: 10px;display: flex">
+          <div style="flex: 1;color:grey;font-size: 13px">
+            当前字数 {{deltaToText(content).length}} （最大支持20000字）
+          </div>
           <el-button type="success" @click="submitComment" plain>发表评论</el-button>
         </div>
       </div>

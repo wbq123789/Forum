@@ -5,7 +5,18 @@ import {get, post} from "@/net";
 import axios from "axios";
 import {computed, reactive, ref} from "vue";
 import { QuillDeltaToHtmlConverter } from 'quill-delta-to-html';
-import {ArrowLeft, CircleCheck, EditPen, Female, Male, Plus, Star} from "@element-plus/icons-vue";
+import {
+  ArrowLeft,
+  ChatSquare,
+  Check,
+  CircleCheck,
+  Delete,
+  EditPen,
+  Female,
+  Male,
+  Plus,
+  Star
+} from "@element-plus/icons-vue";
 import Card from "@/components/Card.vue";
 import router from "@/router";
 import TopicTag from "@/components/TopicTag.vue";
@@ -27,7 +38,7 @@ const edit=ref(false)
 const comment=reactive({
   show:false,
   text:'',
-  quote: -1
+  quote: null
 })
 const store=useStore()
 const tid=route.params.tid;
@@ -74,6 +85,12 @@ function loadComments(page) {
 function onCommentAdd() {
   comment.show=false
   loadComments(Math.floor(++topic.data.comments / 10) +1)
+}
+function deleteComment(cid) {
+  get(`api/forum/deleteComment?cid=${cid}&uid=${store.user.id}`,()=>{
+    ElMessage.success("评论删除成功！")
+    loadComments(topic.page)
+  })
 }
 </script>
 
@@ -166,18 +183,22 @@ function onCommentAdd() {
               </div>
               <div class="desc">{{item.user.email}}</div>
             </div>
-            <el-divider style="margin: 10px 0"/>
-            <div style="text-align: left;margin: 0 5px">
-              <div class="desc">微信号: {{item.user.wx || '已隐藏或未填写'}}</div>
-              <div class="desc">QQ号: {{item.user.qq || '已隐藏或未填写'}}</div>
-              <div class="desc">手机号: {{item.user.phone || '已隐藏或未填写'}}</div>
-            </div>
           </div>
           <div class="topic-main-right">
-            <div style="font-size: 13px;color: grey">
-              <div>评论时间：{{new Date(item.time).toLocaleString()}}</div>
+            <div v-if="item.quote" class="comment-quote">
+              回复: {{item.quote}}
             </div>
             <div class="topic-content" v-html="convertToHtml(item.content)"></div>
+            <div style="display: flex;flex-direction: row;gap: 13vw">
+              <div style="font-size: 13px;color: grey;text-align: left;align-content: center">
+                <div>评论时间：{{new Date(item.time).toLocaleString()}}</div>
+              </div>
+              <div>
+                <el-link :icon="ChatSquare" type="info" @click="comment.show=true;comment.quote=item">回复评论</el-link>
+                <el-link :icon="Delete" type="danger" @click="deleteComment(item.id)" v-if="item.user.id=store.user.id" style="margin-left: 20px">&nbsp;删除评论</el-link>
+              </div>
+            </div>
+
           </div>
         </div>
         <div style="width: fit-content;margin: 20px auto">
@@ -198,13 +219,21 @@ function onCommentAdd() {
                           :quote="comment.quote"
                           @comment="onCommentAdd"
                           :tid="tid"/>
-    <div class="add-comment" @click="comment.show=true">
+    <div class="add-comment" @click="comment.show=true;comment.quote=null">
       <el-icon><Plus/></el-icon>
     </div>
   </div>
 </template>
 
 <style lang="less" scoped>
+.comment-quote{
+  font-size: 13px;
+  color: grey;
+  background-color: rgba(94,94,94,0.2);
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+}
 .add-comment{
   position: fixed;
   bottom: 20px;

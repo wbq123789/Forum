@@ -73,13 +73,13 @@ public class ForumController {
         return utils.messageHandle(() -> topicService.createTopic(uid, vo));
     }
     /**
-     * 获取话题列表
+     * 获取话题列表(分页)
      * @param page 页码
      * @param type 话题类型
      * @return 话题列表
      */
     @GetMapping("/list-topic")
-    @Operation(summary = "获取话题列表")
+    @Operation(summary = "获取话题列表(分页)")
     public RestBean<List<TopicPreviewVO>> listTopic(@RequestParam @Min(0) int page,
                                                     @RequestParam @Min(0) int type){
         return RestBean.success(topicService.listTopicByPage(page+1, type));
@@ -148,14 +148,29 @@ public class ForumController {
      * @return 正常为空
      */
     @PostMapping("/add-comment")
+    @Operation(summary = "用户对帖子发表评论")
     public RestBean<Void> addComment(@RequestAttribute(Const.ATTR_USER_ID) int uid,
                                      @RequestBody @Valid AddCommentVO vo){
         return utils.messageHandle(() -> topicService.createComment(uid, vo));
     }
+    /**
+     * 获取评论列表(分页)
+     * @param tid 话题ID
+     * @param page 页码
+     * @return 评论列表
+     */
     @GetMapping("/comments")
+    @Operation(summary = "获取评论列表（分页）")
     public RestBean<List<CommentVO>> comments(@RequestParam @Min(1) int tid,
                                               @RequestParam @Min(0) int page){
         return RestBean.success(topicService.comments(tid,page+1));
+    }
+
+    @GetMapping("/deleteComment")
+    @Operation(summary = "用户删除对某一的帖子评论")
+    public RestBean<Void> deleteComment(@RequestParam @Min(1) int cid,
+                                          @RequestAttribute(Const.ATTR_USER_ID) int uid){
+        return utils.messageHandle(() -> topicService.deleteComment(cid,uid));
     }
     /**
      * 获取用户IP地址
