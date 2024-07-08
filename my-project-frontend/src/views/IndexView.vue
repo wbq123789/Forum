@@ -58,7 +58,7 @@ function userLogout() {
             <el-dropdown>
               <el-avatar :src="store.avatarUrl"/>
               <template #dropdown>
-                <el-dropdown-item>
+                <el-dropdown-item @click="router.push('/index/user-setting')">
                   <el-icon><operation/></el-icon>
                   个人设置
                 </el-dropdown-item>

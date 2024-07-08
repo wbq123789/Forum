@@ -1,4 +1,4 @@
-package com.example.entity.vo.response;
+package com.example.entity.vo.request;
 
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.validation.constraints.Min;

@@ -5,7 +5,7 @@ import {get, post} from "@/net";
 import axios from "axios";
 import {computed, reactive, ref} from "vue";
 import { QuillDeltaToHtmlConverter } from 'quill-delta-to-html';
-import {ArrowLeft, CircleCheck, EditPen, Female, Male, Star} from "@element-plus/icons-vue";
+import {ArrowLeft, CircleCheck, EditPen, Female, Male, Plus, Star} from "@element-plus/icons-vue";
 import Card from "@/components/Card.vue";
 import router from "@/router";
 import TopicTag from "@/components/TopicTag.vue";
@@ -13,28 +13,36 @@ import InteractButton from "@/components/InteractButton.vue";
 import {ElMessage} from "element-plus";
 import {useStore} from "@/store";
 import TopicEditor from "@/components/TopicEditor.vue";
+import TopicCommentEidtor from "@/components/TopicCommentEidtor.vue";
 
 const route=useRoute()
 const topic=reactive({
   data:null,
   like:false,
   collect:false,
-  comments:[]
+  comments:null,
+  page:1
 })
 const edit=ref(false)
+const comment=reactive({
+  show:false,
+  text:'',
+  quote: -1
+})
 const store=useStore()
 const tid=route.params.tid;
 const init = () => get(`api/forum/topic?tid=${tid}`,data=> {
   topic.data = data
   topic.like=data.interact.like
   topic.collect=data.interact.collect
+  loadComments(1)
 })
 init()
-const content=computed(()=>{
-  const ops = JSON.parse(topic.data.content).ops
+function convertToHtml(content){
+  const ops = JSON.parse(content).ops
   const converter = new QuillDeltaToHtmlConverter(ops, { inlineStyles: true });
   return converter.convert();
-})
+}
 function interact(type,message){
   get(`/api/forum/interact?tid=${tid}&type=${type}&state=${!topic[type]}`,()=>{
     topic[type]= !topic[type]
@@ -56,6 +64,16 @@ function updateTopic(editor) {
     edit.value = false
     init()
   })
+}
+
+function loadComments(page) {
+  topic.comments=null
+  topic.page=page
+  get(`/api/forum/comments?tid=${tid}&page=${page-1}`,data=>topic.comments=data)
+}
+function onCommentAdd() {
+  comment.show=false
+  loadComments(Math.floor(++topic.data.comments / 10) +1)
 }
 </script>
 
@@ -99,7 +117,7 @@ function updateTopic(editor) {
         <div class="desc" style="margin: 0 5px">{{topic.data.user.intro||'这个用户很神秘，没有个人简介！'}}</div>
       </div>
       <div class="topic-main-right">
-        <div class="topic-content" v-html="content"></div>
+        <div class="topic-content" v-html="convertToHtml(topic.data.content)"></div>
         <el-divider/>
         <div style="font-size: 13px;color: grey;text-align: center">
           <div>发帖时间：{{new Date(topic.data.time).toLocaleString()}}</div>
@@ -128,13 +146,85 @@ function updateTopic(editor) {
         </div>
       </div>
     </div>
+    <transition name="el-fade-in-linear" mode="out-in">
+      <div v-if="topic.comments">
+        <div class="topic-main" style="margin-top: 10px" v-for="item in topic.comments">
+          <div class="topic-main-left">
+            <el-avatar :src="item.user.avatar===null ?
+        'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png':
+        `${axios.defaults.baseURL}/api/file/download/images${item.user.avatar}`"
+                       :size="60"/>
+            <div>
+              <div style="font-size: 18px;font-weight: bold">
+                {{item.user.username}}
+                <span style="color: hotpink" v-if="item.user.gender ===1">
+              <el-icon><Female/></el-icon>
+            </span>
+                <span style="color: dodgerblue" v-if="item.user.gender ===0">
+              <el-icon><Male/></el-icon>
+            </span>
+              </div>
+              <div class="desc">{{item.user.email}}</div>
+            </div>
+            <el-divider style="margin: 10px 0"/>
+            <div style="text-align: left;margin: 0 5px">
+              <div class="desc">微信号: {{item.user.wx || '已隐藏或未填写'}}</div>
+              <div class="desc">QQ号: {{item.user.qq || '已隐藏或未填写'}}</div>
+              <div class="desc">手机号: {{item.user.phone || '已隐藏或未填写'}}</div>
+            </div>
+          </div>
+          <div class="topic-main-right">
+            <div style="font-size: 13px;color: grey">
+              <div>评论时间：{{new Date(item.time).toLocaleString()}}</div>
+            </div>
+            <div class="topic-content" v-html="convertToHtml(item.content)"></div>
+          </div>
+        </div>
+        <div style="width: fit-content;margin: 20px auto">
+          <el-pagination background layout="prev,pager,next"
+                         v-model:current-page="topic.page"
+                         @current-change="loadComments"
+                         :total="topic.data.comments" :page-size="10"
+                         hide-on-single-page
+          />
+        </div>
+      </div>
+    </transition>
     <topic-editor :show="edit" @close="edit=false" v-if="topic.data && store.forum.types"
     :default-title="topic.data.title" :default-type="topic.data.type"
     :default-text="topic.data.content" submit-button="更新帖子内容" :submit="updateTopic"/>
+    <topic-comment-eidtor :show="comment.show"
+                          @close="comment.show=false"
+                          :quote="comment.quote"
+                          @comment="onCommentAdd"
+                          :tid="tid"/>
+    <div class="add-comment" @click="comment.show=true">
+      <el-icon><Plus/></el-icon>
+    </div>
   </div>
 </template>
 
-<style scoped>
+<style lang="less" scoped>
+.add-comment{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bolder;
+  text-align: center;
+  line-height: 45px;
+  color: var(--el-color-primary);
+  background: var(--el-bg-color-overlay);
+  box-shadow: var(--el-box-shadow-lighter);
+
+  &:hover{
+    background: var(--el-border-color-extra-light);
+    cursor: pointer;
+  }
+}
 .topic-page{
   display: flex;
   flex-direction: column;

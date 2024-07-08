@@ -7,7 +7,7 @@ import java.util.Date;
 
 /**
  * @program: forum
- * @description: 帖子详情页返回数据实体类
+ * @description: 帖子详情页返回数据类
  * @author: 王贝强
  * @create: 2024-06-15 21:37
  */
@@ -20,7 +20,7 @@ public class TopicDetailVO {
     Date time;
     User user;
     Interact interact;
-//     Long comments;
+    Long comments;
 
     @Data
     @AllArgsConstructor

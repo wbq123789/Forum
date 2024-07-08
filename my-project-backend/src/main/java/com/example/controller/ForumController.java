@@ -2,6 +2,9 @@ package com.example.controller;
 
 import com.example.entity.RestBean;
 import com.example.entity.dto.Interact;
+import com.example.entity.vo.request.AddCommentVO;
+import com.example.entity.vo.request.TopicCreateVO;
+import com.example.entity.vo.request.TopicUpdateVO;
 import com.example.entity.vo.response.*;
 import com.example.service.TopicService;
 import com.example.service.WeatherService;
@@ -14,7 +17,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -80,7 +82,7 @@ public class ForumController {
     @Operation(summary = "获取话题列表")
     public RestBean<List<TopicPreviewVO>> listTopic(@RequestParam @Min(0) int page,
                                                     @RequestParam @Min(0) int type){
-        return RestBean.success(topicService.listTopicByPage(page, type));
+        return RestBean.success(topicService.listTopicByPage(page+1, type));
     }
     /**
      * 获取置顶话题
@@ -114,7 +116,7 @@ public class ForumController {
 
     }
     /**
-     * 点赞/收藏
+     * 点赞/收藏帖子
      * @param tid 话题ID
      * @param type 互动类型
      * @param state 互动状态
@@ -139,6 +141,21 @@ public class ForumController {
     @Operation(summary = "获取用户收藏的帖子")
     public RestBean<List<TopicPreviewVO>> collects(@RequestAttribute(Const.ATTR_USER_ID) int uid){
         return RestBean.success(topicService.listTopicCollects(uid));
+    }
+    /**
+     * 用户评论接口
+     * @param uid 用户ID
+     * @return 正常为空
+     */
+    @PostMapping("/add-comment")
+    public RestBean<Void> addComment(@RequestAttribute(Const.ATTR_USER_ID) int uid,
+                                     @RequestBody @Valid AddCommentVO vo){
+        return utils.messageHandle(() -> topicService.createComment(uid, vo));
+    }
+    @GetMapping("/comments")
+    public RestBean<List<CommentVO>> comments(@RequestParam @Min(1) int tid,
+                                              @RequestParam @Min(0) int page){
+        return RestBean.success(topicService.comments(tid,page+1));
     }
     /**
      * 获取用户IP地址

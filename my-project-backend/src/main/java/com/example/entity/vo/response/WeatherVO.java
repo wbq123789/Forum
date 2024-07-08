@@ -6,7 +6,7 @@ import lombok.Data;
 
 /**
  * @program: forum
- * @description:
+ * @description: 天气信息返回视图类
  * @author: 王贝强
  * @create: 2024-06-11 12:12
  */
