@@ -13,7 +13,7 @@ const emit=defineEmits(['close','comment'])
 const content=ref()
 const init = () => content.value=new Delta()
 function submitComment() {
-  if (deltaToText(content.value).length) {
+  if (deltaToText(content.value).length > 2000) {
     ElMessage.warning("评论字数超过最大限制，请修改评论内容！")
     return
   }
@@ -57,7 +57,7 @@ function deltaToText(delta) {
         </div>
         <div style="margin-top: 10px;display: flex">
           <div style="flex: 1;color:grey;font-size: 13px">
-            当前字数 {{deltaToText(content).length}} （最大支持20000字）
+            当前字数 {{deltaToText(content).length}} （最大支持2000字）
           </div>
           <el-button type="success" @click="submitComment" plain>发表评论</el-button>
         </div>

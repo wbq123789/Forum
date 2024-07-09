@@ -11,6 +11,7 @@ import com.example.entity.vo.request.TopicCreateVO;
 import com.example.entity.vo.request.TopicUpdateVO;
 import com.example.entity.vo.response.*;
 import com.example.mapper.*;
+import com.example.service.NotificationService;
 import com.example.service.TopicService;
 import com.example.utils.CacheUtils;
 import com.example.utils.Const;
@@ -18,6 +19,7 @@ import com.example.utils.FlowUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +49,8 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
     @Resource
     TopicCommentMapper topicCommentMapper;
     @Resource
+    NotificationService notificationService;
+    @Resource
     StringRedisTemplate stringRedisTemplate;
     @Resource
     FlowUtils flowUtils;
@@ -55,6 +59,8 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
     CacheUtils cacheUtils;
 
     private Set<Integer> types=null;
+    @Autowired
+    private TopicMapper topicMapper;
 
     @PostConstruct
     public void init(){
@@ -190,6 +196,28 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         comment.setUid(uid);
         BeanUtils.copyProperties(vo,comment);
         topicCommentMapper.insert(comment);
+        Topic topic=this.getById(vo.getTid());
+        Account account=accountMapper.selectById(uid);
+        if (vo.getQuote()>0){
+            TopicComment topicComment=topicCommentMapper.selectById(vo.getQuote());
+            if(!Objects.equals(account.getId(),topicComment.getUid())){
+                notificationService.addNotification(
+                        topicComment.getUid(),
+                        "您有一条新的评论回复，请点击链接跳转查看！",
+                        account.getUsername()+" 回复了你发表的评论，去看看吧！",
+                        "success",
+                        "/index/topic-detail/"+topicComment.getTid()
+                        );
+            }
+        }else if(!Objects.equals(account.getId(),topic.getUid())){
+            notificationService.addNotification(
+                    topic.getUid(),
+                    "您有一条新的帖子回复，请点击链接跳转查看！",
+                    account.getUsername()+" 回复了你发表的主题: "+topic.getTitle()+"，去看看吧！",
+                    "success",
+                    "/index/topic-detail/"+topic.getId()
+            );
+        }
         return null;
     }
 

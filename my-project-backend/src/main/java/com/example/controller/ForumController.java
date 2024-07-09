@@ -110,6 +110,7 @@ public class ForumController {
      * @return 更新结果
      */
     @PostMapping("/update-topic")
+    @Operation(summary = "更新话题内容")
     public RestBean<Void> updateTopic(@Valid @RequestBody TopicUpdateVO vo,
                                       @RequestAttribute(Const.ATTR_USER_ID) int uid){
         return utils.messageHandle(() -> topicService.updateTopic(uid,vo));
