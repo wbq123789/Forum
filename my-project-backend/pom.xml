@@ -107,20 +107,10 @@
         <profile>
             <id>dev</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <environment>dev</environment>
-            </properties>
-        </profile>
-        <!-- 测试环境 -->
-        <profile>
-            <id>test</id>
-            <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <environment>test</environment>
+                <environment>dev</environment>
             </properties>
         </profile>
         <!-- 生产环境 -->
