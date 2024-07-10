@@ -1,4 +1,6 @@
 # 开发环境配置
+server:
+  port: 80
 springdoc:
   paths-to-match: /api/**
   swagger-ui:
@@ -10,7 +12,7 @@ spring:
     password: UMUNGOCGACNHANOL
     port: 25
   rabbitmq:
-    addresses: 154.9.254.205
+    addresses: 47.92.80.128
     username: rabbitmq
     password: qaz13579
     virtual-host: /
@@ -21,14 +23,14 @@ spring:
       max-lifetime: 1800000
       minimum-idle: 5
       maximum-pool-size: 20
-    url: jdbc:mysql://154.9.254.205:3306/Forum
+    url: jdbc:mysql://47.92.80.128:3306/Forum
     username: Forum
     password: tafGYzAMEmY4WSJC
     driver-class-name: com.mysql.cj.jdbc.Driver
   data:
     redis:
       database: 0
-      host: 154.9.254.205
+      host: 47.92.80.128
       port: 6379
       username: dokihub
       password: flying13579
@@ -58,7 +60,7 @@ spring:
       credentials: false
       methods: '*'
 minio:
-  endpoint: http://154.9.254.205:9000
+  endpoint: http://47.92.80.128:9000
   access-key: JAm1aUN2PHwmgOPAEO07
   secret-key: 41LwF9eotVRVcgQBN9uCgfxVkvY0JX3GFS9TP5W1
   bucket-name: forum

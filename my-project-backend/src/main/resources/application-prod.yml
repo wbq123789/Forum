@@ -10,21 +10,22 @@ mybatis-plus:
 spring:
   mail:
     host: smtp.163.com
-    username: javastudy111@163.com
-    password: VKQFYZMUSUZGSGEG
+    username: javaweb111@163.com
+    password: UMUNGOCGACNHANOL
+    port: 25
   rabbitmq:
     addresses: localhost
-    username: admin
-    password: admin
+    username: rabbitmq
+    password: qaz13579
     virtual-host: /
   datasource:
-    url: jdbc:mysql://localhost:3306/test
-    username: root
-    password: 123456
+    url: jdbc:mysql://localhost:3306/Forum
+    username: Forum
+    password: tafGYzAMEmY4WSJC
     driver-class-name: com.mysql.cj.jdbc.Driver
   security:
     jwt:
-      key: 'abcdefghijklmn'
+      key: 'my-forum-key'
       expire: 72
       limit:
         base: 10
@@ -43,3 +44,10 @@ spring:
       origin: '*'
       credentials: false
       methods: '*'
+minio:
+  endpoint: http://localhost:9000
+  access-key: JAm1aUN2PHwmgOPAEO07
+  secret-key: 41LwF9eotVRVcgQBN9uCgfxVkvY0JX3GFS9TP5W1
+  bucket-name: forum
+weather:
+  key: e770b20ba7384ad28533bb81da1acf1c
