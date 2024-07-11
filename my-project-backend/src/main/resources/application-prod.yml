@@ -14,15 +14,26 @@ spring:
     password: UMUNGOCGACNHANOL
     port: 25
   rabbitmq:
-    addresses: RabbitMq
+    addresses: localhost
     username: rabbitmq
     password: qaz13579
     virtual-host: /
   datasource:
-    url: jdbc:mysql://mysql:3306/Forum
+    url: jdbc:mysql://localhost:3306/Forum
     username: Forum
     password: tafGYzAMEmY4WSJC
     driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      database: 0
+      host: localhost
+      port: 6379
+      username: dokihub
+      password: flying13579
+      lettuce:
+        pool:
+          min-idle: 2
+          max-idle: 10
   security:
     jwt:
       key: 'my-forum-key'
@@ -45,7 +56,7 @@ spring:
       credentials: false
       methods: '*'
 minio:
-  endpoint: http://MinIO:9000
+  endpoint: http://localhost:9000
   access-key: JAm1aUN2PHwmgOPAEO07
   secret-key: 41LwF9eotVRVcgQBN9uCgfxVkvY0JX3GFS9TP5W1
   bucket-name: forum
