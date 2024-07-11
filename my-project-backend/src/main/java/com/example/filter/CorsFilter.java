@@ -40,8 +40,10 @@ public class CorsFilter extends HttpFilter {
      * @param response 响应
      */
     private void addCorsHeader(HttpServletRequest request, HttpServletResponse response) {
-        response.addHeader("Access-Control-Allow-Origin", this.resolveOrigin(request));
-        response.addHeader("Access-Control-Allow-Methods", this.resolveMethod());
+       // response.addHeader("Access-Control-Allow-Origin", this.resolveOrigin(request));
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        //response.addHeader("Access-Control-Allow-Methods", this.resolveMethod());
+        response.addHeader("Access-Control-Allow-Methods","GET,POST,PUT,DELETE,OPTIONS");
         response.addHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
         if(credentials) {
             response.addHeader("Access-Control-Allow-Credentials", "true");
