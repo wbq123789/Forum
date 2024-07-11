@@ -53,7 +53,7 @@ spring:
       limit: 10
       block: 30
     cors:
-      origin: '*'
+      origin: '47.92.80.128'
       credentials: false
       methods: '*'
 minio:
