@@ -14,12 +14,12 @@ spring:
     password: UMUNGOCGACNHANOL
     port: 25
   rabbitmq:
-    addresses: localhost
+    addresses: RabbitMq
     username: rabbitmq
     password: qaz13579
     virtual-host: /
   datasource:
-    url: jdbc:mysql://localhost:3306/Forum
+    url: jdbc:mysql://mysql:3306/Forum
     username: Forum
     password: tafGYzAMEmY4WSJC
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -45,7 +45,7 @@ spring:
       credentials: false
       methods: '*'
 minio:
-  endpoint: http://localhost:9000
+  endpoint: http://MinIO:9000
   access-key: JAm1aUN2PHwmgOPAEO07
   secret-key: 41LwF9eotVRVcgQBN9uCgfxVkvY0JX3GFS9TP5W1
   bucket-name: forum
